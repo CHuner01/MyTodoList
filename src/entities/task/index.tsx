@@ -10,6 +10,7 @@ function Task({id, name, description, status, selected}: TaskType) {
     const fetchTasks = useTasksStore(state => state.fetchTasks);
     const applyFilter = useTasksStore(state => state.applyFilter);
 
+
     let taskStatus: TaskStatusType = status;
 
     const [taskSelected, setTaskSelected] = useState(selected)

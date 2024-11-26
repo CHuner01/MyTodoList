@@ -1,6 +1,7 @@
 import { create } from "zustand"
 import TaskType, {TasksFilterType} from "../shared/types";
 import {apiAxios} from "../shared/config";
+import {totalmem} from "os";
 
 
 type FetchTasksFunction = (url: string) => void;
@@ -17,16 +18,15 @@ interface TasksState {
 
 export const useTasksStore = create<TasksState>((set) => ({
     tasks: [],
+    setTasks: (newTasks) => set(() => ({tasks: newTasks})),
     tasksFilter: "all",
     setTasksFilter: (filter) => set({ tasksFilter: filter}),
-    setTasks: (newTasks) => set(() => ({tasks: newTasks})),
     fetchTasks: async (url) => {
         try {
             const response = await apiAxios.get(url)
             let arrayTasks = response.data.data
 
             console.log("fetchTasks")
-            console.log(arrayTasks)
 
             let arrayLen = arrayTasks.length;
             console.log(arrayLen)
@@ -57,7 +57,6 @@ export const useTasksStore = create<TasksState>((set) => ({
         }
         else if (tasksFilter === "finished") {
             await fetchTasks("/tasks?filters%5Bstatus%5D=done");
-
         }
         else if (tasksFilter === "unfinished") {
             await fetchTasks("/tasks?filters%5Bstatus%5D=working&filters%5Bstatus%5D=open");
@@ -68,9 +67,7 @@ export const useTasksStore = create<TasksState>((set) => ({
             set((state) => ({
                 tasks: state.tasks.filter((task: TaskType) => selectedTasksId.includes(task.id))
             }))
-
         }
-        console.log("получили фильтр " + tasksFilter)
     }
 
 }));

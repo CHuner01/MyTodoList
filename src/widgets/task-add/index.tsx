@@ -16,9 +16,6 @@ function AddTask() {
 
 
     function CreateTask() {
-
-        //очищать поля, если нет ошибок
-
         console.log("CreateTask");
         apiAxios.post("/tasks", {
             "data" : {

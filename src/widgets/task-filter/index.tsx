@@ -4,7 +4,6 @@ import {TasksFilterType} from "../../shared/types";
 function TasksFilter() {
 
     const setTasksFilter = useTasksStore(state => state.setTasksFilter);
-    const tasksFilter = useTasksStore((state) => state.tasksFilter);
     const fetchTasks = useTasksStore(state => state.fetchTasks);
     const applyFilter = useTasksStore(state => state.applyFilter);
 
@@ -16,7 +15,6 @@ function TasksFilter() {
             <select onChange={(e) => {
                 const newFilter = e.target.value as TasksFilterType;
                 setTasksFilter(newFilter);
-                console.log("поменяли фильтр " + tasksFilter)
                 applyFilter(newFilter, fetchTasks);
 
             }}>
