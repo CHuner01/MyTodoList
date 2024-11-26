@@ -21,9 +21,14 @@ function MainPage() {
 
     useEffect(() => {
         if (fetching) {
-            console.log("useEffect")
-            applyFilter(tasksFilter, fetchTasks, currentPage);
-            setFetching(false);
+            if ((totalTasks === 0) || (tasks.length < totalTasks)) {
+                console.log("useEffect")
+                applyFilter(tasksFilter, fetchTasks, currentPage).finally(() => {
+                    setFetching(false);
+                });
+            } else {
+                setFetching(false);
+            }
         }
     }, [fetching]);
 

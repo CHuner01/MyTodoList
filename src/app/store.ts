@@ -12,7 +12,7 @@ interface TasksState {
     fetchTasks: FetchTasksFunction;
     tasksFilter: TasksFilterType;
     setTasksFilter: (filter: TasksFilterType) => void;
-    applyFilter: ( tasksFilter: TasksFilterType, fetchTasks: FetchTasksFunction, currentPage: number) => void;
+    applyFilter: ( tasksFilter: TasksFilterType, fetchTasks: FetchTasksFunction, currentPage: number) => Promise<void>;
 
     fetching: boolean;
     setFetching: (fetchingState: boolean) => void;
@@ -39,19 +39,17 @@ export const useTasksStore = create<TasksState>((set) => ({
             console.log("fetchTasks")
 
             let arrayLen = arrayTasks.length;
-            for (let i = 0; i < arrayLen; i++) {
-                const newTask: TaskType = {
-                    id: arrayTasks[i].id,
-                    name: arrayTasks[i].attributes.name,
-                    description: arrayTasks[i].attributes.description,
-                    status: arrayTasks[i].attributes.status,
-                    selected: false,
-                }
-                set((state) => ({
-                    tasks: [...state.tasks, newTask],
-                }));
-            }
             set((state) => ({
+                tasks: [
+                    ...state.tasks,
+                    ...arrayTasks.map((task: any) => ({
+                        id: task.id,
+                        name: task.attributes.name,
+                        description: task.attributes.description,
+                        status: task.attributes.status,
+                        selected: false,
+                    })),
+                ],
                 currentPage: state.currentPage + 1,
                 totalTasks: response.data.meta.pagination.total,
             }));
@@ -76,12 +74,13 @@ export const useTasksStore = create<TasksState>((set) => ({
                 "&pagination%5Bpage%5D=" + currentPage.toString() + "&pagination%5BpageSize%5D=5");
         }
         else if (tasksFilter === "selected") {
-            await fetchTasks("/tasks");
+            await fetchTasks("/tasks?pagination%5Bpage%5D=" + currentPage.toString() + "&pagination%5BpageSize%5D=2");
             let selectedTasksId: number[] = JSON.parse(localStorage.getItem('selectedTasks') || '[]');
             set((state) => ({
                 tasks: state.tasks.filter((task: TaskType) => selectedTasksId.includes(task.id))
             }))
         }
+        return Promise.resolve();
     }
 
 }));
