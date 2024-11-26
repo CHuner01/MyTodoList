@@ -1,9 +1,9 @@
-type Task = {
+type TaskType = {
     id: number;
     name: string;
     description: string;
-    status: "NEW" | "COMPLETED" | "UNCOMPLETED";
+    status: "done" | "open" | "working" | null;
     selected: boolean;
 }
 
-export default Task
+export default TaskType

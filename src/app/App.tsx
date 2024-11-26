@@ -3,11 +3,11 @@ import AddTask from "../widgets/task-add/ui";
 
 
 function App() {
-  return (
+    return (
       <>
           <AddTask />
       </>
-  );
+    );
 }
 
 export default App;

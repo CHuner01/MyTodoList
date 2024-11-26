@@ -1,16 +1,31 @@
 import { create } from "zustand"
-import Task from "../shared/types";
+import TaskType from "../shared/types";
+import {apiAxios} from "../shared/config";
 
 
 interface TasksState {
-    tasks: Task[];
-    addTask: (task: Task) => void;
+    tasks: TaskType[];
+    setTasks: (newTasks: TaskType[]) => void;
+    fetchTasks: (url: string) => void;
+    addTask: (task: TaskType) => void;
     deleteTask: (id: number) => void;
 }
 
 export const useTasksStore = create<TasksState>((set) => ({
     tasks: [],
-    addTask: (task: Task) => set((state) => (
+    setTasks: (newTasks) => set(() => ({tasks: newTasks})),
+    fetchTasks: async (url) => {
+        try {
+            const response = await apiAxios.get(url)
+            console.log(response)
+            set({tasks: response.data.data})
+        }
+        catch (error) {
+            console.log(error)
+        }
+
+    },
+    addTask: (task: TaskType) => set((state) => (
         {
             tasks: [
                 ...state.tasks,
@@ -20,54 +35,41 @@ export const useTasksStore = create<TasksState>((set) => ({
         })),
     deleteTask: (id: number) => set((state) => (
         {
-            tasks: state.tasks.filter((task: Task) => task.id !== id),
+            tasks: state.tasks.filter((task: TaskType) => task.id !== id),
         })),
 }));
 
 interface TaskState {
-    id: number;
-    name: string;
-    description: string;
-    status: "NEW" | "COMPLETED" | "UNCOMPLETED";
-    selected: boolean;
-    setId: (id: number) => void;
-    setName: (name: string) => void;
-    setDescription: (description: string) => void;
-    setStatus: (status: "NEW" | "COMPLETED" | "UNCOMPLETED") => void;
-    setSelected: (selected: boolean) => void;
+    task: TaskType,
+    setTaskId: (id: number) => void;
+    setTaskName: (name: string) => void;
+    setTaskDescription: (description: string) => void;
+    setTaskStatus: (status: "done" | "open" | "working" | null) => void;
+    setTaskSelected: (selected: boolean) => void;
 }
 
 export const useTaskStore = create<TaskState>((set) => ({
-    id: 0,
-    name: "",
-    description: "",
-    status: "NEW",
-    selected: false,
-
-    setId: (id: number) => set((state) => (
-        {
-            id: id
-        }
+    task: {
+        id: 0,
+        name: "",
+        description: "",
+        status: "open",
+        selected: false,
+    },
+    setTaskId: (id: number) => set((state) => (
+        { task: { ...state.task, id} }
     )),
-    setName: (name: string) => set((state) => (
-        {
-            name: name
-        }
+    setTaskName: (name: string) => set((state) => (
+        { task: { ...state.task, name} }
     )),
-    setDescription: (description: string) => set((state) => (
-        {
-            description: description
-        }
+    setTaskDescription: (description: string) => set((state) => (
+        { task: { ...state.task, description} }
     )),
-    setStatus: (status: "NEW" | "COMPLETED" | "UNCOMPLETED") => set((state) => (
-        {
-            status: status
-        }
+    setTaskStatus: (status: "done" | "open" | "working" | null) => set((state) => (
+        { task: { ...state.task, status} }
     )),
-    setSelected: (selected: boolean) => set((state) => (
-        {
-            selected: selected
-        }
+    setTaskSelected: (selected: boolean) => set((state) => (
+        { task: { ...state.task, selected} }
     )),
 }))
 
