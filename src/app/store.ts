@@ -1,27 +1,33 @@
 import { create } from "zustand"
-import TaskType from "../shared/types";
+import TaskType, {TasksFilterType} from "../shared/types";
 import {apiAxios} from "../shared/config";
 
 
+type FetchTasksFunction = (url: string) => void;
 
 interface TasksState {
     tasks: TaskType[];
     setTasks: (newTasks: TaskType[]) => void;
-    fetchTasks: (url: string) => void;
-    addTask: (task: TaskType) => void;
-    deleteTask: (id: number) => void;
+    fetchTasks: FetchTasksFunction;
+    tasksFilter: TasksFilterType;
+    setTasksFilter: (filter: TasksFilterType) => void;
+    applyFilter: ( tasksFilter: TasksFilterType, fetchTasks: FetchTasksFunction) => void;
+
 }
 
 export const useTasksStore = create<TasksState>((set) => ({
     tasks: [],
+    tasksFilter: "all",
+    setTasksFilter: (filter) => set({ tasksFilter: filter}),
+    setTasks: (newTasks) => set(() => ({tasks: newTasks})),
     fetchTasks: async (url) => {
         try {
             const response = await apiAxios.get(url)
-
             let arrayTasks = response.data.data
-          //  set({tasks: arrayTasks})
+
             console.log("fetchTasks")
             console.log(arrayTasks)
+
             let arrayLen = arrayTasks.length;
             console.log(arrayLen)
 
@@ -44,52 +50,30 @@ export const useTasksStore = create<TasksState>((set) => ({
         }
 
     },
-    setTasks: (newTasks) => set(() => ({tasks: newTasks})),
-    addTask: (task: TaskType) => set((state) => (
-        {
-            tasks: [
-                ...state.tasks,
-                {id: task.id, name: task.name, description: task.description,
-                    status: task.status, selected: task.selected},
-            ]
-        })),
-    deleteTask: (id: number) => set((state) => (
-        {
-            tasks: state.tasks.filter((task: TaskType) => task.id !== id),
-        })),
+    applyFilter: async (tasksFilter, fetchTasks) => {
+
+        if (tasksFilter === "all") {
+            await fetchTasks("/tasks");
+        }
+        else if (tasksFilter === "finished") {
+            await fetchTasks("/tasks?filters%5Bstatus%5D=done");
+
+        }
+        else if (tasksFilter === "unfinished") {
+            await fetchTasks("/tasks?filters%5Bstatus%5D=working&filters%5Bstatus%5D=open");
+        }
+        else if (tasksFilter === "selected") {
+            await fetchTasks("/tasks");
+            let selectedTasksId: number[] = JSON.parse(localStorage.getItem('selectedTasks') || '[]');
+            set((state) => ({
+                tasks: state.tasks.filter((task: TaskType) => selectedTasksId.includes(task.id))
+            }))
+
+        }
+        console.log("получили фильтр " + tasksFilter)
+    }
+
 }));
 
-interface TaskState {
-    task: TaskType,
-    setTaskId: (id: number) => void;
-    setTaskName: (name: string) => void;
-    setTaskDescription: (description: string) => void;
-    setTaskStatus: (status: "done" | "open" | "working" | null) => void;
-    setTaskSelected: (selected: boolean) => void;
-}
 
-export const useTaskStore = create<TaskState>((set) => ({
-    task: {
-        id: 0,
-        name: "",
-        description: "",
-        status: "open",
-        selected: false,
-    },
-    setTaskId: (id: number) => set((state) => (
-        { task: { ...state.task, id} }
-    )),
-    setTaskName: (name: string) => set((state) => (
-        { task: { ...state.task, name} }
-    )),
-    setTaskDescription: (description: string) => set((state) => (
-        { task: { ...state.task, description} }
-    )),
-    setTaskStatus: (status: "done" | "open" | "working" | null) => set((state) => (
-        { task: { ...state.task, status} }
-    )),
-    setTaskSelected: (selected: boolean) => set((state) => (
-        { task: { ...state.task, selected} }
-    )),
-}))
 

@@ -1,19 +1,14 @@
 import TaskType, {TaskStatusType} from "../../shared/types";
 import {apiAxios} from "../../shared/config";
-import {stat} from "fs";
 import {useState} from "react";
 import {useTasksStore} from "../../app/store";
 function Task({id, name, description, status, selected}: TaskType) {
 
     //сделать пропсы одним объектом Task
 
-    //кнопка Добавить в избранное
-
-    //поле Изменить статус
-
-    //вызов GetTasks при удалении
-
+    const tasksFilter = useTasksStore((state) => state.tasksFilter);
     const fetchTasks = useTasksStore(state => state.fetchTasks);
+    const applyFilter = useTasksStore(state => state.applyFilter);
 
     let taskStatus: TaskStatusType = status;
 
@@ -32,6 +27,7 @@ function Task({id, name, description, status, selected}: TaskType) {
         })
             .then(function (response) {
                 console.log(response);
+                applyFilter(tasksFilter, fetchTasks);
             })
             .catch(function (error) {
                 console.log(error);
@@ -50,7 +46,10 @@ function Task({id, name, description, status, selected}: TaskType) {
         }
         localStorage.setItem('selectedTasks', JSON.stringify(selectedTasksId));
         setTaskSelected(taskSelected => !taskSelected);
+        applyFilter(tasksFilter, fetchTasks);
     }
+
+
 
     function DeleteTask() {
         console.log("DeleteTask");
@@ -61,7 +60,7 @@ function Task({id, name, description, status, selected}: TaskType) {
         apiAxios.delete("/tasks/" + id.toString())
             .then(function (response) {
                 console.log(response);
-                fetchTasks("/tasks");
+                applyFilter(tasksFilter, fetchTasks);
             })
             .catch(function (error) {
                 console.log(error);

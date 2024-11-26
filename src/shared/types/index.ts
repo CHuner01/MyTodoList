@@ -1,5 +1,7 @@
 export type TaskStatusType = "done" | "open" | "working" | null;
 
+export type TasksFilterType = "finished" | "unfinished" | "all" | "selected";
+
 type TaskType = {
     id: number;
     name: string;

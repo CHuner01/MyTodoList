@@ -8,9 +8,9 @@ type TaskListType = {
 
 function TaskList({ tasks }: TaskListType) {
 
+    //вынести в функцию
+
     let selectedTasksId: number[] = [];
-
-
     const storedSelectedTasks = localStorage.getItem('selectedTasks');
 
 

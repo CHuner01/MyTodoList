@@ -1,4 +1,4 @@
-import {useTasksStore, useTaskStore} from "../../app/store";
+import {useTasksStore} from "../../app/store";
 import axios from "axios";
 import {apiAxios} from "../../shared/config";
 import useGetTasks from "../../shared/api";
@@ -6,13 +6,10 @@ import GetTasks from "../../shared/api";
 
 function AddTask() {
 
-   // const task = useTaskStore((state) => state.task);
-   // const setTaskName = useTaskStore((state) => state.setTaskName);
-   // const setTaskDescription = useTaskStore((state) => state.setTaskDescription);
-   // const setTaskStatus = useTaskStore((state) => state.setTaskStatus);
-
     const tasks = useTasksStore(state => state.tasks);
+    const tasksFilter = useTasksStore((state) => state.tasksFilter);
     const fetchTasks = useTasksStore(state => state.fetchTasks);
+    const applyFilter = useTasksStore(state => state.applyFilter);
 
     let taskName: string;
     let taskDescription: string;
@@ -31,7 +28,7 @@ function AddTask() {
             }
         }).then(function (response) {
             console.log(response);
-            fetchTasks("/tasks");
+            applyFilter(tasksFilter, fetchTasks);
 
         })
         .catch(function (error) {
