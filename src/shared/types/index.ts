@@ -1,8 +1,10 @@
+export type TaskStatusType = "done" | "open" | "working" | null;
+
 type TaskType = {
     id: number;
     name: string;
     description: string;
-    status: "done" | "open" | "working" | null;
+    status: TaskStatusType;
     selected: boolean;
 }
 

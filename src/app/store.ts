@@ -3,6 +3,7 @@ import TaskType from "../shared/types";
 import {apiAxios} from "../shared/config";
 
 
+
 interface TasksState {
     tasks: TaskType[];
     setTasks: (newTasks: TaskType[]) => void;
@@ -13,18 +14,37 @@ interface TasksState {
 
 export const useTasksStore = create<TasksState>((set) => ({
     tasks: [],
-    setTasks: (newTasks) => set(() => ({tasks: newTasks})),
     fetchTasks: async (url) => {
         try {
             const response = await apiAxios.get(url)
-            console.log(response)
-            set({tasks: response.data.data})
+
+            let arrayTasks = response.data.data
+          //  set({tasks: arrayTasks})
+            console.log("fetchTasks")
+            console.log(arrayTasks)
+            let arrayLen = arrayTasks.length;
+            console.log(arrayLen)
+
+            set(() => ({tasks: []}))
+            for (let i = 0; i < arrayLen; i++) {
+                const newTask: TaskType = {
+                    id: arrayTasks[i].id,
+                    name: arrayTasks[i].attributes.name,
+                    description: arrayTasks[i].attributes.description,
+                    status: arrayTasks[i].attributes.status,
+                    selected: false,
+                }
+                set((state) => ({
+                    tasks: [...state.tasks, newTask],
+                }));
+            }
         }
         catch (error) {
             console.log(error)
         }
 
     },
+    setTasks: (newTasks) => set(() => ({tasks: newTasks})),
     addTask: (task: TaskType) => set((state) => (
         {
             tasks: [

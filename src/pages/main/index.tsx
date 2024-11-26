@@ -1,17 +1,18 @@
 import GetTasks from "../../shared/api";
 import {useEffect} from "react";
-import AddTask from "../../widgets/task-add/ui";
+import AddTask from "../../widgets/task-add";
 import TaskList from "../../widgets/task-list";
 import {useTasksStore} from "../../app/store";
 
 function MainPage() {
 
     const tasks = useTasksStore((state) => state.tasks);
+    const fetchTasks = useTasksStore(state => state.fetchTasks);
 
-    //передавать массив в TaskList
+
 
     useEffect(() => {
-        GetTasks();
+        fetchTasks("/tasks");
     }, []);
 
     return(
@@ -19,7 +20,7 @@ function MainPage() {
             <p>Создать задачу</p>
             <AddTask />
             <p>Список задач</p>
-            {/*<TaskList tasks={}/>*/}
+            <TaskList tasks={tasks} />
         </>
     );
 }
