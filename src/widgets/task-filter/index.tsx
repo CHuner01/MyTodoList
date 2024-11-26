@@ -6,6 +6,7 @@ function TasksFilter() {
     const setTasksFilter = useTasksStore(state => state.setTasksFilter);
     const fetchTasks = useTasksStore(state => state.fetchTasks);
     const applyFilter = useTasksStore(state => state.applyFilter);
+    const currentPage = useTasksStore(state => state.currentPage);
 
 
 
@@ -15,7 +16,7 @@ function TasksFilter() {
             <select onChange={(e) => {
                 const newFilter = e.target.value as TasksFilterType;
                 setTasksFilter(newFilter);
-                applyFilter(newFilter, fetchTasks);
+                applyFilter(newFilter, fetchTasks, currentPage);
 
             }}>
                 <option value="all">Без фильтра</option>

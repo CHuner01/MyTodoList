@@ -10,6 +10,7 @@ function AddTask() {
     const tasksFilter = useTasksStore((state) => state.tasksFilter);
     const fetchTasks = useTasksStore(state => state.fetchTasks);
     const applyFilter = useTasksStore(state => state.applyFilter);
+    const currentPage = useTasksStore(state => state.currentPage);
 
     let taskName: string;
     let taskDescription: string;
@@ -25,7 +26,7 @@ function AddTask() {
             }
         }).then(function (response) {
             console.log(response);
-            applyFilter(tasksFilter, fetchTasks);
+            applyFilter(tasksFilter, fetchTasks, currentPage);
 
         })
         .catch(function (error) {

@@ -9,6 +9,7 @@ function Task({id, name, description, status, selected}: TaskType) {
     const tasksFilter = useTasksStore((state) => state.tasksFilter);
     const fetchTasks = useTasksStore(state => state.fetchTasks);
     const applyFilter = useTasksStore(state => state.applyFilter);
+    const currentPage = useTasksStore(state => state.currentPage);
 
 
     let taskStatus: TaskStatusType = status;
@@ -28,7 +29,7 @@ function Task({id, name, description, status, selected}: TaskType) {
         })
             .then(function (response) {
                 console.log(response);
-                applyFilter(tasksFilter, fetchTasks);
+                applyFilter(tasksFilter, fetchTasks, currentPage);
             })
             .catch(function (error) {
                 console.log(error);
@@ -47,7 +48,7 @@ function Task({id, name, description, status, selected}: TaskType) {
         }
         localStorage.setItem('selectedTasks', JSON.stringify(selectedTasksId));
         setTaskSelected(taskSelected => !taskSelected);
-        applyFilter(tasksFilter, fetchTasks);
+        applyFilter(tasksFilter, fetchTasks, currentPage);
     }
 
 
@@ -61,7 +62,7 @@ function Task({id, name, description, status, selected}: TaskType) {
         apiAxios.delete("/tasks/" + id.toString())
             .then(function (response) {
                 console.log(response);
-                applyFilter(tasksFilter, fetchTasks);
+                applyFilter(tasksFilter, fetchTasks, currentPage);
             })
             .catch(function (error) {
                 console.log(error);

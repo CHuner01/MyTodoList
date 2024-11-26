@@ -14,23 +14,44 @@ function MainPage() {
     const fetchTasks = useTasksStore(state => state.fetchTasks);
     const applyFilter = useTasksStore(state => state.applyFilter);
 
+    const fetching = useTasksStore(state => state.fetching);
+    const currentPage = useTasksStore(state => state.currentPage);
+    const setFetching = useTasksStore(state => state.setFetching);
+    const totalTasks = useTasksStore(state => state.totalTasks);
+
     useEffect(() => {
-        applyFilter(tasksFilter, fetchTasks);
+        if (fetching) {
+            console.log("useEffect")
+            applyFilter(tasksFilter, fetchTasks, currentPage);
+            setFetching(false);
+        }
+    }, [fetching]);
+
+    useEffect(() => {
+        document.addEventListener('scroll', scrollHandler)
+        return function() {
+            document.removeEventListener('scroll', scrollHandler)
+        }
     }, []);
+
+    const scrollHandler = (e: Event) => {
+        if (((document.documentElement.scrollHeight - (document.documentElement.scrollTop + window.innerHeight)) < 2)
+       ) {
+            console.log('scroll')
+            setFetching(true);
+        }
+    }
+
+
+
 
     //тест
     function Test() {
-        apiAxios.get("/tasks", {
-            params: {
-                pagination: {
-                    pageSize : 2,
-                    page: 2
-                }
-
-            }
-        })
+        apiAxios.get("/tasks")
             .then(function (response) {
                 console.log(response)
+                console.log(tasks.length)
+                console.log(totalTasks)
 
             })
             .catch(function (error) {
