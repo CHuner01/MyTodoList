@@ -2,6 +2,10 @@ import TaskType, {TaskStatusType} from "../../shared/types";
 import {apiAxios} from "../../shared/config";
 import {useState} from "react";
 import {useTasksStore} from "../../app/store";
+import {Checkbox, Fab, FormControl, Grid2, InputLabel, MenuItem, Paper, Select, Typography} from "@mui/material";
+import BookmarkBorderIcon from '@mui/icons-material/BookmarkBorder';
+import BookmarkIcon from '@mui/icons-material/Bookmark';
+import ClearIcon from '@mui/icons-material/Clear';
 function Task({id, name, description, status, selected}: TaskType) {
 
     //сделать пропсы одним объектом Task
@@ -15,8 +19,6 @@ function Task({id, name, description, status, selected}: TaskType) {
     let taskStatus: TaskStatusType = status;
 
     const [taskSelected, setTaskSelected] = useState(selected)
-
-
 
     function ChangeStatus() {
         console.log("ChangeStatus");
@@ -71,34 +73,57 @@ function Task({id, name, description, status, selected}: TaskType) {
 
     return (
         <>
-            <p>------------------------------------------------------------------------</p>
-            <p>Новая задача</p>
-            <p>{name}</p>
-            <p>{description}</p>
+            <Paper elevation={1}>
+                <Grid2 container sx={{display: "flex", justifyContent: "space-between"}}>
+                    <Grid2 p={1}>
+                        <Grid2 m={2} width={350} minWidth={300}>
+                            <Typography sx={{ wordBreak: "break-word" }} variant="h2">{name}</Typography>
+                        </Grid2>
+                        <Grid2 m={2} mt={3} width={250} minWidth={200}>
+                            <Typography sx={{ wordBreak: "break-word" }} variant="h3">{description}</Typography>
+                        </Grid2>
+                    </Grid2>
+                    <Grid2 p={2}  sx={{display: "flex", flexDirection: "row"}}>
+                        <Grid2 m={1} sx={{display: "flex", alignItems: "center"}}>
+                            <Checkbox
+                                size="large"
+                                checked={taskSelected}
+                                icon={<BookmarkBorderIcon />}
+                                checkedIcon={<BookmarkIcon />}
+                                onChange={SelectTask}
+                            />
+                        </Grid2>
+                        <Grid2 m={1} minWidth={150} sx={{display: "flex", alignItems: "center"}}>
+                            <FormControl fullWidth>
+                                <InputLabel id="demo-simple-select-label">Статус</InputLabel>
+                                <Select
+                                    labelId="demo-simple-select-label"
+                                    id="demo-simple-select"
+                                    defaultValue={taskStatus}
+                                    onChange={(e) => {
+                                    (taskStatus = e.target.value as TaskStatusType);
+                                    ChangeStatus();
+                                    }}
+                                >
+                                    <MenuItem value={"open"}>Открыта</MenuItem>
+                                    <MenuItem value={"working"}>В работе</MenuItem>
+                                    <MenuItem value={"done"}>Выполнена</MenuItem>
+                                </Select>
+                            </FormControl>
+                        </Grid2>
+                        <Grid2 m={1} ml={3}>
+                            <Fab color="primary" size="medium" onClick={DeleteTask}>
+                                <ClearIcon />
+                            </Fab>
+                        </Grid2>
+                    </Grid2>
+                </Grid2>
 
-            <p>Избранное</p>
-            {taskSelected ? <p>Избранное</p> : <p>Обычное</p>}
-            <button onClick={SelectTask}>Изменить избранное</button>
-            <button onClick={DeleteTask}>Удалить</button>
-
-
-            <p>Статус</p>
-            <p>{taskStatus}</p>
-            <select id="select"
-                    defaultValue={taskStatus === null ? "" : taskStatus}
-                    onChange={(e) => {
-                (taskStatus = e.target.value as TaskStatusType);
-                ChangeStatus();
-            }}>
-                <option value="done">Выполнена</option>
-                <option value="working">В работе</option>
-                <option value="open">Открыта</option>
-            </select>
-
-
-
+            </Paper>
         </>
     );
 }
+
+
 
 export default Task;

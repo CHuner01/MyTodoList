@@ -17,6 +17,7 @@ interface TasksState {
     fetching: boolean;
     setFetching: (fetchingState: boolean) => void;
     currentPage: number;
+    setCurrentPage: (currentPage: number) => void;
     totalTasks: number;
 
 }
@@ -29,6 +30,7 @@ export const useTasksStore = create<TasksState>((set) => ({
     fetching: true,
     setFetching: (fetchingState: boolean) => set(() => ({fetching: fetchingState})),
     currentPage: 1,
+    setCurrentPage: (newPage: number) => set(() => ({currentPage: newPage})),
     totalTasks: 0,
     fetchTasks: async (url) => {
         try {

@@ -6,6 +6,8 @@ import {useTasksStore} from "../../app/store";
 import TaskFilter from "../../widgets/task-filter";
 import axios from "axios";
 import {apiAxios} from "../../shared/config";
+import {theme} from "./config";
+import {Container, Grid2, ThemeProvider, Typography} from "@mui/material";
 
 function MainPage() {
 
@@ -55,8 +57,8 @@ function MainPage() {
         apiAxios.get("/tasks")
             .then(function (response) {
                 console.log(response)
-                console.log(tasks.length)
-                console.log(totalTasks)
+                console.log(currentPage)
+
 
             })
             .catch(function (error) {
@@ -68,12 +70,24 @@ function MainPage() {
 
     return(
         <>
-            <button onClick={Test}>Тест</button>
-            <p>Создать задачу</p>
-            <AddTask />
-            <TaskFilter />
-            <p>Список задач</p>
-            <TaskList tasks={tasks} />
+            <ThemeProvider theme={theme}>
+
+                <Container maxWidth="md" sx={{display: "flex", bgcolor: "primary.main",
+                    flexDirection: "column",
+                    alignItems: "center",  minHeight: '100vh'}}>
+
+                    <Typography variant="h1">Todo List</Typography>
+                    <button onClick={Test}>Тест</button>
+                    <button onClick={() => console.log(tasks)}>Получить</button>
+
+                    <AddTask />
+                    <Grid2 sx={{bgcolor: "secondary.main", m: 2, p: 2, borderRadius: 1}}>
+                        <TaskFilter />
+                    </Grid2>
+                    <TaskList tasks={tasks} />
+                </Container>
+
+            </ThemeProvider>
         </>
     );
 }

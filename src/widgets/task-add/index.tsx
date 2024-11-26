@@ -3,6 +3,7 @@ import axios from "axios";
 import {apiAxios} from "../../shared/config";
 import useGetTasks from "../../shared/api";
 import GetTasks from "../../shared/api";
+import {Button, Container, Grid2, Paper, TextField} from "@mui/material";
 
 function AddTask() {
 
@@ -11,6 +12,7 @@ function AddTask() {
     const fetchTasks = useTasksStore(state => state.fetchTasks);
     const applyFilter = useTasksStore(state => state.applyFilter);
     const currentPage = useTasksStore(state => state.currentPage);
+    const setCurrentPage = useTasksStore(state => state.setCurrentPage);
 
     let taskName: string;
     let taskDescription: string;
@@ -24,8 +26,9 @@ function AddTask() {
                 "description": taskDescription,
                 "status": "open"
             }
-        }).then(function (response) {
+        }).then(async function (response) {
             console.log(response);
+            await setCurrentPage(1);
             applyFilter(tasksFilter, fetchTasks, currentPage);
 
         })
@@ -36,17 +39,40 @@ function AddTask() {
 
     return (
         <>
-            <p>Название</p>
-            <input onChange={(e) => {
-                taskName = e.target.value;
-            }} />
-            <p>Описание</p>
-            <input onChange={(e) => {
-                taskDescription = e.target.value;
-            }} />
-
-            <button onClick={() => console.log(tasks)}>Получить</button>
-            <button onClick={CreateTask}>Добавить</button>
+            <Container sx={{display: "flex",
+                flexDirection: "column",
+                alignItems: "center"}}>
+                <Paper sx={{minWidth: 250, }}>
+                    <Grid2 container sx={{display: "flex", flexDirection: "row",
+                        justifyContent: "space-between"}}>
+                        <Grid2 m={1}>
+                            <Grid2 m={1}>
+                                <TextField id="standard-basic" label="Новая задача"
+                                           sx={{minWidth: 250}}
+                                           multiline
+                                           variant="standard"
+                                           onChange={(e) => {
+                                               taskName = e.target.value;
+                                           }}
+                                />
+                            </Grid2>
+                            <Grid2 m={1}>
+                                <TextField id="standard-basic" label="Описание"
+                                           sx={{minWidth: 250}}
+                                           multiline
+                                           variant="standard"
+                                           onChange={(e) => {
+                                               taskDescription = e.target.value;
+                                           }}
+                                />
+                            </Grid2>
+                        </Grid2>
+                        <Grid2 m={3} sx={{display: "flex", alignItems: "flex-end"}}>
+                            <Button variant="contained" onClick={CreateTask}>Добавить</Button>
+                        </Grid2>
+                    </Grid2>
+                </Paper>
+            </Container>
         </>
 );
 }

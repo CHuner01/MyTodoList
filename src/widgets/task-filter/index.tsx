@@ -1,5 +1,6 @@
 import {useTasksStore} from "../../app/store";
 import {TasksFilterType} from "../../shared/types";
+import {Container, FormControl, Grid2, InputLabel, MenuItem, Select} from "@mui/material";
 
 function TasksFilter() {
 
@@ -12,18 +13,33 @@ function TasksFilter() {
 
     return(
         <>
-            <p>Фильтр по</p>
-            <select onChange={(e) => {
-                const newFilter = e.target.value as TasksFilterType;
-                setTasksFilter(newFilter);
-                applyFilter(newFilter, fetchTasks, currentPage);
-
+            <Container sx={{display: "flex",
+                flexDirection: "column",
+                alignItems: "center",
             }}>
-                <option value="all">Без фильтра</option>
-                <option value="finished">Выполненные</option>
-                <option value="unfinished">Не выполненные</option>
-                <option value="selected">Избранные</option>
-            </select>
+                <Grid2 sx={{minWidth: 300, }}>
+                    <FormControl fullWidth >
+                        <InputLabel id="demo-simple-select-label">Фильтр</InputLabel>
+                        <Select
+                            labelId="demo-simple-select-label"
+                            id="demo-simple-select"
+                            defaultValue={"all"}
+                            onChange={(e) => {
+                                const newFilter = e.target.value as TasksFilterType;
+                                setTasksFilter(newFilter);
+                                applyFilter(newFilter, fetchTasks, currentPage);
+                            }}
+
+                        >
+                            <MenuItem value={"all"}>Без фильтра</MenuItem>
+                            <MenuItem value={"finished"}>Выполненные</MenuItem>
+                            <MenuItem value={"unfinished"}>Не выполненные</MenuItem>
+                            <MenuItem value={"selected"}>Избранные</MenuItem>
+                        </Select>
+                    </FormControl>
+                </Grid2>
+
+            </Container>
         </>
     );
 }
