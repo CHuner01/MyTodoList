@@ -6,8 +6,8 @@ import {useTasksStore} from "../../app/store";
 import TaskFilter from "../../widgets/task-filter";
 import axios from "axios";
 import {apiAxios} from "../../shared/config";
-import {theme} from "./config";
-import {Container, Grid2, ThemeProvider, Typography} from "@mui/material";
+import {theme} from "./styles";
+import {CircularProgress, Container, Grid2, ThemeProvider, Typography} from "@mui/material";
 
 function MainPage() {
 
@@ -21,12 +21,17 @@ function MainPage() {
     const setFetching = useTasksStore(state => state.setFetching);
     const totalTasks = useTasksStore(state => state.totalTasks);
 
+    const loading = useTasksStore(state => state.loading);
+    const setLoading = useTasksStore(state => state.setLoading);
+
+
     useEffect(() => {
         if (fetching) {
             if ((totalTasks === 0) || (tasks.length < totalTasks)) {
                 console.log("useEffect")
                 applyFilter(tasksFilter, fetchTasks, currentPage).finally(() => {
                     setFetching(false);
+                    setLoading(false);
                 });
             } else {
                 setFetching(false);
@@ -50,24 +55,6 @@ function MainPage() {
     }
 
 
-
-
-    //тест
-    function Test() {
-        apiAxios.get("/tasks")
-            .then(function (response) {
-                console.log(response)
-                console.log(currentPage)
-
-
-            })
-            .catch(function (error) {
-                console.log(error);
-
-            })
-    }
-
-
     return(
         <>
             <ThemeProvider theme={theme}>
@@ -77,14 +64,13 @@ function MainPage() {
                     alignItems: "center",  minHeight: '100vh'}}>
 
                     <Typography variant="h1">Todo List</Typography>
-                    <button onClick={Test}>Тест</button>
                     <button onClick={() => console.log(tasks)}>Получить</button>
 
                     <AddTask />
                     <Grid2 sx={{bgcolor: "secondary.main", m: 2, p: 2, borderRadius: 1}}>
                         <TaskFilter />
                     </Grid2>
-                    <TaskList tasks={tasks} />
+                    {loading ? <CircularProgress color="secondary" /> : <TaskList tasks={tasks} />}
                 </Container>
 
             </ThemeProvider>

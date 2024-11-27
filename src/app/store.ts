@@ -1,6 +1,6 @@
 import { create } from "zustand"
 import TaskType, {TasksFilterType} from "../shared/types";
-import {apiAxios} from "../shared/config";
+import {apiAxios, pageSize} from "../shared/config";
 
 
 
@@ -8,7 +8,7 @@ type FetchTasksFunction = (url: string) => void;
 
 interface TasksState {
     tasks: TaskType[];
-    setTasks: (newTasks: TaskType[]) => void;
+    setTasks: (newTasks: TaskType[]) => Promise<void>;
     fetchTasks: FetchTasksFunction;
     tasksFilter: TasksFilterType;
     setTasksFilter: (filter: TasksFilterType) => void;
@@ -19,18 +19,27 @@ interface TasksState {
     currentPage: number;
     setCurrentPage: (currentPage: number) => void;
     totalTasks: number;
+    loading: boolean;
+    setLoading: (loadingState: boolean) => void;
 
 }
 
 export const useTasksStore = create<TasksState>((set) => ({
     tasks: [],
-    setTasks: (newTasks) => set(() => ({tasks: newTasks})),
+    setTasks: (newTasks) => {
+        return new Promise<void>((resolve) => {
+            set({tasks: newTasks});
+            resolve();
+        })
+    },
     tasksFilter: "all",
     setTasksFilter: (filter) => set({ tasksFilter: filter}),
     fetching: true,
     setFetching: (fetchingState: boolean) => set(() => ({fetching: fetchingState})),
     currentPage: 1,
     setCurrentPage: (newPage: number) => set(() => ({currentPage: newPage})),
+    loading: true,
+    setLoading: (loadingState: boolean) => set(() => ({loading: loadingState})),
     totalTasks: 0,
     fetchTasks: async (url) => {
         try {
@@ -39,6 +48,8 @@ export const useTasksStore = create<TasksState>((set) => ({
             console.log(response)
 
             console.log("fetchTasks")
+
+
 
             let arrayLen = arrayTasks.length;
             set((state) => ({
@@ -64,19 +75,21 @@ export const useTasksStore = create<TasksState>((set) => ({
     applyFilter: async (tasksFilter, fetchTasks, currentPage) => {
 
         if (tasksFilter === "all") {
-            await fetchTasks("/tasks?pagination%5Bpage%5D=" + currentPage.toString() + "&pagination%5BpageSize%5D=2");
+            await fetchTasks("/tasks?pagination%5Bpage%5D=" + currentPage.toString() +
+                "&pagination%5BpageSize%5D=" + pageSize.toString());
             console.log("page", currentPage)
         }
         else if (tasksFilter === "finished") {
             await fetchTasks("/tasks?filters%5Bstatus%5D=done&pagination%5Bpage%5D=" + currentPage.toString()
-                + "&pagination%5BpageSize%5D=5");
+                + "&pagination%5BpageSize%5D=" + pageSize.toString());
         }
         else if (tasksFilter === "unfinished") {
             await fetchTasks("/tasks?filters%5Bstatus%5D=working&filters%5Bstatus%5D=open" +
-                "&pagination%5Bpage%5D=" + currentPage.toString() + "&pagination%5BpageSize%5D=5");
+                "&pagination%5Bpage%5D=" + currentPage.toString() + "&pagination%5BpageSize%5D=" + pageSize.toString());
         }
         else if (tasksFilter === "selected") {
-            await fetchTasks("/tasks?pagination%5Bpage%5D=" + currentPage.toString() + "&pagination%5BpageSize%5D=2");
+            await fetchTasks("/tasks?pagination%5Bpage%5D=" + currentPage.toString() +
+                "&pagination%5BpageSize%5D=" + pageSize.toString());
             let selectedTasksId: number[] = JSON.parse(localStorage.getItem('selectedTasks') || '[]');
             set((state) => ({
                 tasks: state.tasks.filter((task: TaskType) => selectedTasksId.includes(task.id))
@@ -84,7 +97,6 @@ export const useTasksStore = create<TasksState>((set) => ({
         }
         return Promise.resolve();
     }
-
 }));
 
 

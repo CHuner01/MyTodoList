@@ -14,6 +14,9 @@ function Task({id, name, description, status, selected}: TaskType) {
     const fetchTasks = useTasksStore(state => state.fetchTasks);
     const applyFilter = useTasksStore(state => state.applyFilter);
     const currentPage = useTasksStore(state => state.currentPage);
+    const setCurrentPage = useTasksStore(state => state.setCurrentPage);
+    const setLoading = useTasksStore(state => state.setLoading);
+    const setTasks = useTasksStore(state => state.setTasks);
 
 
     let taskStatus: TaskStatusType = status;
@@ -31,7 +34,14 @@ function Task({id, name, description, status, selected}: TaskType) {
         })
             .then(function (response) {
                 console.log(response);
-                applyFilter(tasksFilter, fetchTasks, currentPage);
+                setLoading(true);
+                setTasks([]).finally(() => (
+                    applyFilter(tasksFilter, fetchTasks, 1).finally(() => (
+                        setLoading(false)
+                    ))
+                ));
+                setCurrentPage(1);
+
             })
             .catch(function (error) {
                 console.log(error);
@@ -50,7 +60,14 @@ function Task({id, name, description, status, selected}: TaskType) {
         }
         localStorage.setItem('selectedTasks', JSON.stringify(selectedTasksId));
         setTaskSelected(taskSelected => !taskSelected);
-        applyFilter(tasksFilter, fetchTasks, currentPage);
+        setLoading(true);
+        setTasks([]).finally(() => (
+            applyFilter(tasksFilter, fetchTasks, 1).finally(() => (
+                setLoading(false)
+            ))
+        ));
+        setCurrentPage(1);
+
     }
 
 
@@ -64,7 +81,13 @@ function Task({id, name, description, status, selected}: TaskType) {
         apiAxios.delete("/tasks/" + id.toString())
             .then(function (response) {
                 console.log(response);
-                applyFilter(tasksFilter, fetchTasks, currentPage);
+                setLoading(true);
+                setTasks([]).finally(() => (
+                    applyFilter(tasksFilter, fetchTasks, 1).finally(() => (
+                        setLoading(false)
+                    ))
+                ));
+                setCurrentPage(1);
             })
             .catch(function (error) {
                 console.log(error);

@@ -8,6 +8,9 @@ function TasksFilter() {
     const fetchTasks = useTasksStore(state => state.fetchTasks);
     const applyFilter = useTasksStore(state => state.applyFilter);
     const currentPage = useTasksStore(state => state.currentPage);
+    const setCurrentPage = useTasksStore(state => state.setCurrentPage);
+    const setLoading = useTasksStore(state => state.setLoading);
+    const setTasks = useTasksStore(state => state.setTasks);
 
 
 
@@ -27,7 +30,13 @@ function TasksFilter() {
                             onChange={(e) => {
                                 const newFilter = e.target.value as TasksFilterType;
                                 setTasksFilter(newFilter);
-                                applyFilter(newFilter, fetchTasks, currentPage);
+                                setCurrentPage(1);
+                                setLoading(true);
+                                setTasks([]).finally(() => (
+                                    applyFilter(newFilter, fetchTasks, 1).finally(() => (
+                                        setLoading(false)
+                                    ))
+                                ));
                             }}
 
                         >

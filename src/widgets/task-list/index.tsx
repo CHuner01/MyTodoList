@@ -1,6 +1,7 @@
 import TaskType from "../../shared/types";
 import Task from "../../entities/task";
 import {Grid2} from "@mui/material";
+import {useTasksStore} from "../../app/store";
 
 
 type TaskListType = {
@@ -9,7 +10,6 @@ type TaskListType = {
 
 function TaskList({ tasks }: TaskListType) {
 
-    //вынести в функцию
 
     let selectedTasksId: number[] = [];
     const storedSelectedTasks = localStorage.getItem('selectedTasks');
@@ -47,7 +47,6 @@ function TaskList({ tasks }: TaskListType) {
                         status={task.status}
                         selected={selectedTasksId.includes(task.id)}
                     />
-
                 ))}
             </Grid2>
         </>

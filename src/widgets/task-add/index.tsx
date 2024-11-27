@@ -8,11 +8,13 @@ import {Button, Container, Grid2, Paper, TextField} from "@mui/material";
 function AddTask() {
 
     const tasks = useTasksStore(state => state.tasks);
+    const setTasks = useTasksStore(state => state.setTasks);
     const tasksFilter = useTasksStore((state) => state.tasksFilter);
     const fetchTasks = useTasksStore(state => state.fetchTasks);
     const applyFilter = useTasksStore(state => state.applyFilter);
     const currentPage = useTasksStore(state => state.currentPage);
     const setCurrentPage = useTasksStore(state => state.setCurrentPage);
+    const setLoading = useTasksStore(state => state.setLoading);
 
     let taskName: string;
     let taskDescription: string;
@@ -20,21 +22,29 @@ function AddTask() {
 
     function CreateTask() {
         console.log("CreateTask");
-        apiAxios.post("/tasks", {
-            "data" : {
-                "name": taskName,
-                "description": taskDescription,
-                "status": "open"
-            }
-        }).then(async function (response) {
-            console.log(response);
-            await setCurrentPage(1);
-            applyFilter(tasksFilter, fetchTasks, currentPage);
+        console.log(taskName);
+        if (taskName !== undefined) {
+            apiAxios.post("/tasks", {
+                "data" : {
+                    "name": taskName,
+                    "description": taskDescription,
+                    "status": "open"
+                }
+            }).then(function (response) {
+                console.log(response);
+                setCurrentPage(1);
+                setLoading(true);
+                setTasks([]).finally(() => (
+                    applyFilter(tasksFilter, fetchTasks, 1).finally(() => (
+                        setLoading(false)
+                    ))
+                ));
+            })
+                .catch(function (error) {
+                    console.log(error);
+                })
+        }
 
-        })
-        .catch(function (error) {
-            console.log(error);
-        })
     }
 
     return (

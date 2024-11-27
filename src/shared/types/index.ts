@@ -1,4 +1,4 @@
-export type TaskStatusType = "done" | "open" | "working" | null;
+export type TaskStatusType = "done" | "open" | "working" ;
 
 export type TasksFilterType = "finished" | "unfinished" | "all" | "selected";
 

@@ -7,3 +7,5 @@ export const apiAxios = axios.create({
     baseURL: API_URL,
 
 })
+
+export const pageSize = 3;
