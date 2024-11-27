@@ -27,8 +27,8 @@ interface TasksState {
 export const useTasksStore = create<TasksState>((set) => ({
     tasks: [],
     setTasks: (newTasks) => {
-        return new Promise<void>((resolve) => {
-            set({tasks: newTasks});
+        return new Promise<void>(async (resolve) => {
+            await set({tasks: newTasks});
             resolve();
         })
     },
@@ -38,8 +38,11 @@ export const useTasksStore = create<TasksState>((set) => ({
     setFetching: (fetchingState: boolean) => set(() => ({fetching: fetchingState})),
     currentPage: 1,
     setCurrentPage: (newPage: number) => set(() => ({currentPage: newPage})),
-    loading: true,
-    setLoading: (loadingState: boolean) => set(() => ({loading: loadingState})),
+    loading: false,
+    setLoading: (loadingState: boolean) => set((state) => {
+        state.loading = loadingState
+        return {loading: loadingState}
+    }),
     totalTasks: 0,
     fetchTasks: async (url) => {
         try {
@@ -48,10 +51,6 @@ export const useTasksStore = create<TasksState>((set) => ({
             console.log(response)
 
             console.log("fetchTasks")
-
-
-
-            let arrayLen = arrayTasks.length;
             set((state) => ({
                 tasks: [
                     ...state.tasks,

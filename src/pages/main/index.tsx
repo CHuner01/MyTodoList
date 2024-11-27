@@ -47,8 +47,8 @@ function MainPage() {
     }, []);
 
     const scrollHandler = (e: Event) => {
-        if (((document.documentElement.scrollHeight - (document.documentElement.scrollTop + window.innerHeight)) < 2)
-       ) {
+        if (!loading && ((document.documentElement.scrollHeight - (document.documentElement.scrollTop
+            + window.innerHeight)) < 2)) {
             console.log('scroll')
             setFetching(true);
         }

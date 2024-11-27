@@ -10,12 +10,15 @@ function Task({id, name, description, status, selected}: TaskType) {
 
     //сделать пропсы одним объектом Task
 
+    const tasks = useTasksStore((state) => state.tasks);
+    const fetching = useTasksStore((state) => state.fetching);
     const tasksFilter = useTasksStore((state) => state.tasksFilter);
     const fetchTasks = useTasksStore(state => state.fetchTasks);
     const applyFilter = useTasksStore(state => state.applyFilter);
     const currentPage = useTasksStore(state => state.currentPage);
     const setCurrentPage = useTasksStore(state => state.setCurrentPage);
     const setLoading = useTasksStore(state => state.setLoading);
+    const loading = useTasksStore(state => state.loading);
     const setTasks = useTasksStore(state => state.setTasks);
 
 
@@ -35,11 +38,13 @@ function Task({id, name, description, status, selected}: TaskType) {
             .then(function (response) {
                 console.log(response);
                 setLoading(true);
-                setTasks([]).finally(() => (
+                setTasks([]).finally(() => {
+                    console.log("tasks", tasks)
+                    console.log(loading)
                     applyFilter(tasksFilter, fetchTasks, 1).finally(() => (
                         setLoading(false)
                     ))
-                ));
+                });
                 setCurrentPage(1);
 
             })
@@ -60,13 +65,14 @@ function Task({id, name, description, status, selected}: TaskType) {
         }
         localStorage.setItem('selectedTasks', JSON.stringify(selectedTasksId));
         setTaskSelected(taskSelected => !taskSelected);
+        setCurrentPage(1);
         setLoading(true);
         setTasks([]).finally(() => (
             applyFilter(tasksFilter, fetchTasks, 1).finally(() => (
                 setLoading(false)
             ))
         ));
-        setCurrentPage(1);
+
 
     }
 
@@ -81,13 +87,13 @@ function Task({id, name, description, status, selected}: TaskType) {
         apiAxios.delete("/tasks/" + id.toString())
             .then(function (response) {
                 console.log(response);
+                setCurrentPage(1);
                 setLoading(true);
                 setTasks([]).finally(() => (
                     applyFilter(tasksFilter, fetchTasks, 1).finally(() => (
                         setLoading(false)
                     ))
                 ));
-                setCurrentPage(1);
             })
             .catch(function (error) {
                 console.log(error);

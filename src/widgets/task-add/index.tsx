@@ -1,18 +1,14 @@
 import {useTasksStore} from "../../app/store";
-import axios from "axios";
 import {apiAxios} from "../../shared/config";
-import useGetTasks from "../../shared/api";
-import GetTasks from "../../shared/api";
 import {Button, Container, Grid2, Paper, TextField} from "@mui/material";
 
 function AddTask() {
 
-    const tasks = useTasksStore(state => state.tasks);
+
     const setTasks = useTasksStore(state => state.setTasks);
     const tasksFilter = useTasksStore((state) => state.tasksFilter);
     const fetchTasks = useTasksStore(state => state.fetchTasks);
     const applyFilter = useTasksStore(state => state.applyFilter);
-    const currentPage = useTasksStore(state => state.currentPage);
     const setCurrentPage = useTasksStore(state => state.setCurrentPage);
     const setLoading = useTasksStore(state => state.setLoading);
 

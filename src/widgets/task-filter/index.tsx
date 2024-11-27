@@ -1,6 +1,6 @@
 import {useTasksStore} from "../../app/store";
 import {TasksFilterType} from "../../shared/types";
-import {Container, FormControl, Grid2, InputLabel, MenuItem, Select} from "@mui/material";
+import {Container, FormControl, Grid2, InputLabel, MenuItem, Select, SelectChangeEvent} from "@mui/material";
 
 function TasksFilter() {
 
@@ -12,7 +12,17 @@ function TasksFilter() {
     const setLoading = useTasksStore(state => state.setLoading);
     const setTasks = useTasksStore(state => state.setTasks);
 
-
+    function onChange(e: SelectChangeEvent) {
+        const newFilter = e.target.value as TasksFilterType;
+        setTasksFilter(newFilter);
+        setCurrentPage(1);
+        setLoading(true);
+        setTasks([]).finally(() => (
+            applyFilter(newFilter, fetchTasks, 1).finally(() => (
+                setLoading(false)
+            ))
+        ));
+    }
 
     return(
         <>
@@ -20,25 +30,14 @@ function TasksFilter() {
                 flexDirection: "column",
                 alignItems: "center",
             }}>
-                <Grid2 sx={{minWidth: 300, }}>
+                <Grid2 sx={{minWidth: 300}}>
                     <FormControl fullWidth >
                         <InputLabel id="demo-simple-select-label">Фильтр</InputLabel>
                         <Select
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
                             defaultValue={"all"}
-                            onChange={(e) => {
-                                const newFilter = e.target.value as TasksFilterType;
-                                setTasksFilter(newFilter);
-                                setCurrentPage(1);
-                                setLoading(true);
-                                setTasks([]).finally(() => (
-                                    applyFilter(newFilter, fetchTasks, 1).finally(() => (
-                                        setLoading(false)
-                                    ))
-                                ));
-                            }}
-
+                            onChange={(e) => {onChange(e)}}
                         >
                             <MenuItem value={"all"}>Без фильтра</MenuItem>
                             <MenuItem value={"finished"}>Выполненные</MenuItem>
