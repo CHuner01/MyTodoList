@@ -7,14 +7,14 @@ function AddTask() {
     const addTask = useTasksStore(state => state.addTask);
     const tasksFilter = useTasksStore((state) => state.tasksFilter);
 
-    const [taskName, setTaskName] = useState<string>();
-    const [taskDescription, setTaskDescription] = useState<string>();
+    const [taskName, setTaskName] = useState<string>("");
+    const [taskDescription, setTaskDescription] = useState<string>("");
 
 
     function CreateTask() {
         console.log("CreateTask");
         console.log(taskName);
-        if (taskName !== undefined) {
+        if (taskName !== "") {
             apiAxios.post("/tasks", {
                 "data" : {
                     "name": taskName,
@@ -33,6 +33,8 @@ function AddTask() {
                         selected: false,
                     })
                 }
+                setTaskName("");
+                setTaskDescription("");
             })
                 .catch(function (error) {
                     console.log(error);
@@ -55,6 +57,7 @@ function AddTask() {
                                            sx={{minWidth: 250}}
                                            multiline
                                            variant="standard"
+                                           value={taskName || ""}
                                            onChange={(e) => {
                                                setTaskName(e.target.value);
                                            }}
@@ -65,6 +68,7 @@ function AddTask() {
                                            sx={{minWidth: 250}}
                                            multiline
                                            variant="standard"
+                                           value={taskDescription || ""}
                                            onChange={(e) => {
                                                setTaskDescription(e.target.value);
                                            }}

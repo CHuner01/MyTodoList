@@ -1,12 +1,12 @@
 import React from 'react';
-import AddTask from "../widgets/task-add";
+
 import MainPage from "../pages/main";
+import "./App.css"
 
 
 function App() {
     return (
       <>
-          {/*<AddTask />*/}
           <MainPage />
       </>
     );

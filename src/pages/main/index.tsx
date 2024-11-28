@@ -4,8 +4,6 @@ import AddTask from "../../widgets/task-add";
 import TaskList from "../../widgets/task-list";
 import {useTasksStore} from "../../app/store";
 import TaskFilter from "../../widgets/task-filter";
-import axios from "axios";
-import {apiAxios} from "../../shared/config";
 import {theme} from "./styles";
 import {CircularProgress, Container, Grid2, ThemeProvider, Typography} from "@mui/material";
 
@@ -64,16 +62,10 @@ function MainPage() {
             <ThemeProvider theme={theme}>
 
                 <Container maxWidth="md" sx={{display: "flex", bgcolor: "primary.main",
-                    flexDirection: "column", p:2,
-                    alignItems: "center",  minHeight: '100vh'}}>
+                    flexDirection: "column", p:2, my: 0,
+                    alignItems: "center",  minHeight: '100vh', minWidth: '100wh'}}>
 
                     <Typography variant="h1">Todo List</Typography>
-                    <button onClick={() => {
-                        console.log("tasks", tasks);
-                        console.log("loading", loading);
-                        console.log("fetching", fetching);
-                        console.log("totalTasks", totalTasks);
-                    }}>Получить</button>
 
                     <AddTask />
                     <Grid2 sx={{bgcolor: "secondary.main", m: 2, p: 2, borderRadius: 1}}>

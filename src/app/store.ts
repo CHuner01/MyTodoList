@@ -91,10 +91,6 @@ export const useTasksStore = create<TasksState>((set) => ({
             });
         }
 
-
-
-
-
         if (tasksFilter === "all") {
             await fetchTasks("/tasks?pagination%5Bpage%5D=" + currentPage.toString() +
                 "&pagination%5BpageSize%5D=" + pageSize.toString());
