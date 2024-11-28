@@ -8,17 +8,10 @@ import BookmarkIcon from '@mui/icons-material/Bookmark';
 import ClearIcon from '@mui/icons-material/Clear';
 function Task({id, name, description, status, selected}: TaskType) {
 
-    //сделать пропсы одним объектом Task
-
     const tasks = useTasksStore((state) => state.tasks);
-    const fetching = useTasksStore((state) => state.fetching);
     const tasksFilter = useTasksStore((state) => state.tasksFilter);
-    const fetchTasks = useTasksStore(state => state.fetchTasks);
-    const applyFilter = useTasksStore(state => state.applyFilter);
-    const currentPage = useTasksStore(state => state.currentPage);
-    const setCurrentPage = useTasksStore(state => state.setCurrentPage);
-    const setLoading = useTasksStore(state => state.setLoading);
-    const loading = useTasksStore(state => state.loading);
+    const totalTasks = useTasksStore(state => state.totalTasks);
+    const setTotalTasks = useTasksStore(state => state.setTotalTasks);
     const setTasks = useTasksStore(state => state.setTasks);
 
 
@@ -37,16 +30,10 @@ function Task({id, name, description, status, selected}: TaskType) {
         })
             .then(function (response) {
                 console.log(response);
-                setLoading(true);
-                setTasks([]).finally(() => {
-                    console.log("tasks", tasks)
-                    console.log(loading)
-                    applyFilter(tasksFilter, fetchTasks, 1).finally(() => (
-                        setLoading(false)
-                    ))
-                });
-                setCurrentPage(1);
-
+                if ((tasksFilter === "finished" && taskStatus !== "done") ||
+                    (tasksFilter === "unfinished" && taskStatus === "done")) {
+                    setTasks(tasks.filter(task => task.id !== id));
+                }
             })
             .catch(function (error) {
                 console.log(error);
@@ -59,41 +46,28 @@ function Task({id, name, description, status, selected}: TaskType) {
         let selectedTasksId: number[] = JSON.parse(localStorage.getItem('selectedTasks') || '[]');
         if (taskSelected) {
             selectedTasksId = selectedTasksId.filter(taskId => taskId !== id);
+            if (tasksFilter === "selected") {
+                setTasks(tasks.filter(task => task.id !== id));
+            }
         }
         else {
             selectedTasksId.push(id);
         }
         localStorage.setItem('selectedTasks', JSON.stringify(selectedTasksId));
         setTaskSelected(taskSelected => !taskSelected);
-        setCurrentPage(1);
-        setLoading(true);
-        setTasks([]).finally(() => (
-            applyFilter(tasksFilter, fetchTasks, 1).finally(() => (
-                setLoading(false)
-            ))
-        ));
-
 
     }
-
-
 
     function DeleteTask() {
         console.log("DeleteTask");
         let selectedTasksId: number[] = JSON.parse(localStorage.getItem('selectedTasks') || '[]');
-        selectedTasksId = selectedTasksId.filter(taskId => taskId !== id);
-        localStorage.setItem('selectedTasks', JSON.stringify(selectedTasksId));
-
         apiAxios.delete("/tasks/" + id.toString())
             .then(function (response) {
                 console.log(response);
-                setCurrentPage(1);
-                setLoading(true);
-                setTasks([]).finally(() => (
-                    applyFilter(tasksFilter, fetchTasks, 1).finally(() => (
-                        setLoading(false)
-                    ))
-                ));
+                setTasks(tasks.filter(task => task.id !== id));
+                setTotalTasks(totalTasks - 1);
+                selectedTasksId = selectedTasksId.filter(taskId => taskId !== id);
+                localStorage.setItem('selectedTasks', JSON.stringify(selectedTasksId));
             })
             .catch(function (error) {
                 console.log(error);
@@ -128,7 +102,8 @@ function Task({id, name, description, status, selected}: TaskType) {
                                 <Select
                                     labelId="demo-simple-select-label"
                                     id="demo-simple-select"
-                                    defaultValue={taskStatus}
+                                    label="Статус"
+                                    defaultValue={status}
                                     onChange={(e) => {
                                     (taskStatus = e.target.value as TaskStatusType);
                                     ChangeStatus();

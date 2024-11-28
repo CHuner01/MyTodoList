@@ -7,7 +7,6 @@ function TasksFilter() {
     const setTasksFilter = useTasksStore(state => state.setTasksFilter);
     const fetchTasks = useTasksStore(state => state.fetchTasks);
     const applyFilter = useTasksStore(state => state.applyFilter);
-    const currentPage = useTasksStore(state => state.currentPage);
     const setCurrentPage = useTasksStore(state => state.setCurrentPage);
     const setLoading = useTasksStore(state => state.setLoading);
     const setTasks = useTasksStore(state => state.setTasks);
@@ -16,12 +15,8 @@ function TasksFilter() {
         const newFilter = e.target.value as TasksFilterType;
         setTasksFilter(newFilter);
         setCurrentPage(1);
-        setLoading(true);
-        setTasks([]).finally(() => (
-            applyFilter(newFilter, fetchTasks, 1).finally(() => (
-                setLoading(false)
-            ))
-        ));
+        setTasks([]);
+        applyFilter(newFilter, fetchTasks, 1, setLoading)
     }
 
     return(
@@ -36,6 +31,7 @@ function TasksFilter() {
                         <Select
                             labelId="demo-simple-select-label"
                             id="demo-simple-select"
+                            label="Фильтр"
                             defaultValue={"all"}
                             onChange={(e) => {onChange(e)}}
                         >

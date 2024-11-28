@@ -40,7 +40,7 @@ function TaskList({ tasks }: TaskListType) {
                 {tasks.map((task, index) => (
 
                     <Task
-                        key={index}
+                        key={task.id}
                         id={task.id}
                         name={task.name}
                         description={task.description}

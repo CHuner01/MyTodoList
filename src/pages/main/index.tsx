@@ -24,19 +24,23 @@ function MainPage() {
     const loading = useTasksStore(state => state.loading);
     const setLoading = useTasksStore(state => state.setLoading);
 
+    const firstFetch = useTasksStore(state => state.firstFetch);
+    const changeFirstFetch = useTasksStore(state => state.changeFirstFetch);
+
 
     useEffect(() => {
-        if (fetching) {
-            if ((totalTasks === 0) || (tasks.length < totalTasks)) {
-                console.log("useEffect")
-                applyFilter(tasksFilter, fetchTasks, currentPage).finally(() => {
+        if (fetching && !loading) {
+            if (firstFetch || (tasks.length < totalTasks)) {
+                console.log("useEffect");
+                applyFilter(tasksFilter, fetchTasks, currentPage, setLoading).finally(() => {
                     setFetching(false);
-                    setLoading(false);
                 });
-            } else {
-                setFetching(false);
+            }
+            if (firstFetch) {
+                changeFirstFetch();
             }
         }
+        setFetching(false);
     }, [fetching]);
 
     useEffect(() => {
@@ -60,17 +64,25 @@ function MainPage() {
             <ThemeProvider theme={theme}>
 
                 <Container maxWidth="md" sx={{display: "flex", bgcolor: "primary.main",
-                    flexDirection: "column",
+                    flexDirection: "column", p:2,
                     alignItems: "center",  minHeight: '100vh'}}>
 
                     <Typography variant="h1">Todo List</Typography>
-                    <button onClick={() => console.log(tasks)}>Получить</button>
+                    <button onClick={() => {
+                        console.log("tasks", tasks);
+                        console.log("loading", loading);
+                        console.log("fetching", fetching);
+                        console.log("totalTasks", totalTasks);
+                    }}>Получить</button>
 
                     <AddTask />
                     <Grid2 sx={{bgcolor: "secondary.main", m: 2, p: 2, borderRadius: 1}}>
                         <TaskFilter />
                     </Grid2>
-                    {loading ? <CircularProgress color="secondary" /> : <TaskList tasks={tasks} />}
+                    <TaskList tasks={tasks} />
+                    {loading && <Grid2 sx={{m: 2, p: 2}}>
+                        <CircularProgress color="secondary" />
+                    </Grid2>}
                 </Container>
 
             </ThemeProvider>

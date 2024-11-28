@@ -1,19 +1,14 @@
 import {useTasksStore} from "../../app/store";
 import {apiAxios} from "../../shared/config";
 import {Button, Container, Grid2, Paper, TextField} from "@mui/material";
+import {useState} from "react";
 
 function AddTask() {
-
-
-    const setTasks = useTasksStore(state => state.setTasks);
+    const addTask = useTasksStore(state => state.addTask);
     const tasksFilter = useTasksStore((state) => state.tasksFilter);
-    const fetchTasks = useTasksStore(state => state.fetchTasks);
-    const applyFilter = useTasksStore(state => state.applyFilter);
-    const setCurrentPage = useTasksStore(state => state.setCurrentPage);
-    const setLoading = useTasksStore(state => state.setLoading);
 
-    let taskName: string;
-    let taskDescription: string;
+    const [taskName, setTaskName] = useState<string>();
+    const [taskDescription, setTaskDescription] = useState<string>();
 
 
     function CreateTask() {
@@ -28,13 +23,16 @@ function AddTask() {
                 }
             }).then(function (response) {
                 console.log(response);
-                setCurrentPage(1);
-                setLoading(true);
-                setTasks([]).finally(() => (
-                    applyFilter(tasksFilter, fetchTasks, 1).finally(() => (
-                        setLoading(false)
-                    ))
-                ));
+                let newTask = response.data.data
+                if (tasksFilter === "unfinished" || tasksFilter === "all") {
+                    addTask({
+                        id: newTask.id,
+                        name: newTask.attributes.name,
+                        description: newTask.attributes.description,
+                        status: newTask.attributes.status,
+                        selected: false,
+                    })
+                }
             })
                 .catch(function (error) {
                     console.log(error);
@@ -58,7 +56,7 @@ function AddTask() {
                                            multiline
                                            variant="standard"
                                            onChange={(e) => {
-                                               taskName = e.target.value;
+                                               setTaskName(e.target.value);
                                            }}
                                 />
                             </Grid2>
@@ -68,7 +66,7 @@ function AddTask() {
                                            multiline
                                            variant="standard"
                                            onChange={(e) => {
-                                               taskDescription = e.target.value;
+                                               setTaskDescription(e.target.value);
                                            }}
                                 />
                             </Grid2>

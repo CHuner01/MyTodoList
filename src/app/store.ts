@@ -5,33 +5,38 @@ import {apiAxios, pageSize} from "../shared/config";
 
 
 type FetchTasksFunction = (url: string) => void;
+type SetLoadingFunction = (loadingState: boolean) => void;
 
 interface TasksState {
     tasks: TaskType[];
-    setTasks: (newTasks: TaskType[]) => Promise<void>;
+    addTask: (newTask: TaskType) => void;
+    setTasks: (newTasks: TaskType[]) => void;
     fetchTasks: FetchTasksFunction;
     tasksFilter: TasksFilterType;
     setTasksFilter: (filter: TasksFilterType) => void;
-    applyFilter: ( tasksFilter: TasksFilterType, fetchTasks: FetchTasksFunction, currentPage: number) => Promise<void>;
+    applyFilter: ( tasksFilter: TasksFilterType, fetchTasks: FetchTasksFunction,
+                   currentPage: number, setLoading: SetLoadingFunction) => Promise<void>;
 
     fetching: boolean;
     setFetching: (fetchingState: boolean) => void;
     currentPage: number;
     setCurrentPage: (currentPage: number) => void;
     totalTasks: number;
+    setTotalTasks: (newTotalTasks: number) => void;
     loading: boolean;
     setLoading: (loadingState: boolean) => void;
+    firstFetch: boolean;
+    changeFirstFetch: () => void;
+
 
 }
 
 export const useTasksStore = create<TasksState>((set) => ({
     tasks: [],
-    setTasks: (newTasks) => {
-        return new Promise<void>(async (resolve) => {
-            await set({tasks: newTasks});
-            resolve();
-        })
-    },
+    addTask: (newTask) => set((state) => ({
+        tasks: [...state.tasks, newTask]
+    })),
+    setTasks: (newTasks) => set({tasks: newTasks}),
     tasksFilter: "all",
     setTasksFilter: (filter) => set({ tasksFilter: filter}),
     fetching: true,
@@ -39,19 +44,22 @@ export const useTasksStore = create<TasksState>((set) => ({
     currentPage: 1,
     setCurrentPage: (newPage: number) => set(() => ({currentPage: newPage})),
     loading: false,
-    setLoading: (loadingState: boolean) => set((state) => {
-        state.loading = loadingState
-        return {loading: loadingState}
-    }),
+    setLoading: (loadingState: boolean) => set(() => ({loading: loadingState})),
     totalTasks: 0,
-    fetchTasks: async (url) => {
+    setTotalTasks: (newTotalTasks: number) => set(() => ({totalTasks: newTotalTasks})),
+    firstFetch: true,
+    changeFirstFetch: () => set({firstFetch : false}),
+
+    fetchTasks: async (url) : Promise<number | void>  => {
         try {
             const response = await apiAxios.get(url)
             let arrayTasks = response.data.data
             console.log(response)
 
             console.log("fetchTasks")
+
             set((state) => ({
+
                 tasks: [
                     ...state.tasks,
                     ...arrayTasks.map((task: any) => ({
@@ -66,12 +74,26 @@ export const useTasksStore = create<TasksState>((set) => ({
                 totalTasks: response.data.meta.pagination.total,
             }));
         }
+
         catch (error) {
             console.log(error)
         }
 
     },
-    applyFilter: async (tasksFilter, fetchTasks, currentPage) => {
+    applyFilter: async (tasksFilter, fetchTasks, currentPage,
+                        setLoading) => {
+        setLoading(true);
+
+        if (currentPage === 1) {
+            window.scrollTo({
+                top: 0,
+                behavior: 'smooth',
+            });
+        }
+
+
+
+
 
         if (tasksFilter === "all") {
             await fetchTasks("/tasks?pagination%5Bpage%5D=" + currentPage.toString() +
@@ -87,13 +109,23 @@ export const useTasksStore = create<TasksState>((set) => ({
                 "&pagination%5Bpage%5D=" + currentPage.toString() + "&pagination%5BpageSize%5D=" + pageSize.toString());
         }
         else if (tasksFilter === "selected") {
+            let selectedTasksId: number[] = JSON.parse(localStorage.getItem('selectedTasks') || '[]');
+            await fetchTasks("/tasks");
+            let selectedNumber: number;
+            set((state) => ({
+                totalTasks: state.tasks.filter((task: TaskType) => selectedTasksId.includes(task.id)).length,
+                tasks: [],
+                selectedNumber: state.totalTasks
+            }))
             await fetchTasks("/tasks?pagination%5Bpage%5D=" + currentPage.toString() +
                 "&pagination%5BpageSize%5D=" + pageSize.toString());
-            let selectedTasksId: number[] = JSON.parse(localStorage.getItem('selectedTasks') || '[]');
+
             set((state) => ({
-                tasks: state.tasks.filter((task: TaskType) => selectedTasksId.includes(task.id))
+                tasks: state.tasks.filter((task: TaskType) => selectedTasksId.includes(task.id)),
+                totalTasks: selectedNumber
             }))
         }
+        setLoading(false)
         return Promise.resolve();
     }
 }));
